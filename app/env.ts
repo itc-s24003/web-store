@@ -1,5 +1,7 @@
 const {
-    DATABASE_URL
+    DATABASE_URL,
+    CRYPTO_KEY,
+    CRYPTO_HEX_IV
 
 } = process.env;
 
@@ -21,8 +23,15 @@ class ENV_Error_NotSet extends ENV_Error {
 
 if (!DATABASE_URL) throw new ENV_Error_NotSet("DATABASE_URL");
 
+if (!CRYPTO_KEY) throw new ENV_Error_NotSet("CRYPTO_KEY");
+if (!/[0-9a-fA-F]{64}/.test(CRYPTO_KEY)) throw new ENV_Error("CRYPTO_KEY は hex(32byte)を指定する必要があります");
+if (!CRYPTO_HEX_IV) throw new ENV_Error_NotSet("CRYPTO_HEX_IV");
+if (!/[0-9a-fA-F]{24}/.test(CRYPTO_HEX_IV)) throw new ENV_Error("CRYPTO_HEX_IV は hex(12byte)を指定する必要があります");
 
 
 export const APP_ENV = {
     DATABASE_URL,
+    CRYPTO_KEY,
+    CRYPTO_HEX_IV
+
 }
