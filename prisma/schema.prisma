@@ -11,3 +11,402 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+model Image {
+  id            String  @id @default(ulid())
+
+  url           String
+
+  stores        Store[]
+  products      Product[]
+  tutorialPages TutorialPage[]
+}
+
+
+model Language {
+  id              String                @id @default(ulid())
+
+  name            String                @unique
+
+  
+  users           User[]
+  
+  storeLM         StoreLangMap[]
+  productLM       ProductLangMap[]
+  labelLM         LabelLangMap[]
+  messageLM       MessageLangMap[]
+  tutorialPageLM  TutorialPageLangMap[]
+}
+
+
+
+
+
+
+
+
+model Store {
+  id              Int       @id @default(autoincrement())
+
+  name            String
+  description     String
+
+  imgId           String?
+  img             Image?    @relation(fields: [imgId], references: [id], onDelete: SetNull)
+
+  readyMessageId  String?
+  readyMessage    Message?  @relation(fields: [readyMessageId], references: [id], onDelete: SetNull)
+  
+  tutorialId      String?
+  tutorial        Tutorial? @relation(fields: [tutorialId], references: [id], onDelete: SetNull)
+
+  langMaps        StoreLangMap[]
+}
+
+model StoreLangMap {
+  id          String    @id @default(ulid())
+
+  name        String
+  description String
+
+  storeId     Int
+  store       Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  langId      String
+  lang        Language  @relation(fields: [langId], references: [id], onDelete: Cascade)
+
+
+  @@unique([storeId, langId])
+}
+
+
+
+
+
+
+
+
+model Product {
+  id              String            @id @default(ulid())
+
+  name            String
+  description     String
+  price           Int
+
+  imgId           String?
+  img             Image?            @relation(fields: [imgId], references: [id], onDelete: SetNull)
+
+
+  showTop         Boolean           @default(false)
+  showStock       Boolean           @default(true)
+  stock           Int               @default(0)
+  stockUpdateTime DateTime          @default(now())
+
+  labelId         String?
+  label           Label?            @relation(fields: [labelId], references: [id], onDelete: SetNull)
+
+
+  langMaps        ProductLangMap[]
+  cartItems       CartItem[]
+  messages        Message[]
+}
+
+model ProductLangMap {
+  id          String    @id @default(ulid())
+
+  name        String
+  description String
+
+  productId   String
+  product     Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  langId      String
+  lang        Language  @relation(fields: [langId], references: [id], onDelete: Cascade)
+
+
+  @@unique([productId, langId])
+}
+
+
+
+
+
+
+
+
+model Label {
+  id        String  @id @default(ulid())
+
+  body      String
+  color     String
+
+  products  Product[]
+  langMaps  LabelLangMap[]
+}
+
+model LabelLangMap {
+  id      String    @id @default(ulid())
+
+  body    String
+
+  labelId String
+  label   Label     @relation(fields: [labelId], references: [id], onDelete: Cascade)
+
+  langId  String
+  lang    Language  @relation(fields: [langId], references: [id], onDelete: Cascade)
+
+
+  @@unique([labelId, langId])
+}
+
+
+
+
+
+
+
+
+model CartItem {
+  id        String  @id @default(ulid())
+
+  count     Int
+
+  userId    String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
+  orderId   String?
+  order     Order?  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+
+  @@unique([userId, productId, orderId])
+}
+
+model Order {
+  id          String    @id @default(ulid())
+
+  isReady     Boolean   @default(false)
+  isReceived  Boolean   @default(false)
+  isCanceled  Boolean   @default(false)
+
+  index       Int       @default(autoincrement())
+  requestedAt DateTime  @default(now())
+
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+
+  cartItems CartItem[]
+  messages  Message[]
+}
+
+
+
+
+
+
+
+
+model User {
+  id        String    @id @default(ulid())
+  email     String    @unique
+
+  isStaff   Boolean   @default(false)
+  isAdmin   Boolean   @default(false)
+
+  lockTime  DateTime  @default(now())
+
+  subscribe_endpoint  String?
+  subscribe_authKey   String?
+  subscribe_p256dh    String?
+  subscribe_hash      String?
+  
+
+  langId    String?
+  lang      Language? @relation(fields: [langId], references: [id], onDelete: SetNull)
+
+
+  cartItems CartItem[]
+  orders    Order[]
+  messages  UserMessage[]
+
+  verifyKey UserVerifyKey?
+}
+
+
+
+
+
+
+
+
+model Message {
+  id              String  @id @default(ulid())
+
+  title           String
+  body            String
+
+  url             String?
+  label           String?
+
+  productId       String?
+  product         Product?  @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  orderId         String?
+  order           Order?    @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+
+  langMaps        MessageLangMap[]
+
+  stores          Store[]
+  userMessages    UserMessage[]
+  globalMessages  GlobalMessage[]
+}
+
+model MessageLangMap {
+  id        String  @id @default(ulid())
+
+  title     String
+  body      String
+
+  messageId String
+  message   Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  langId    String
+  lang      Language  @relation(fields: [langId], references: [id], onDelete: Cascade)
+  
+  
+  @@unique([langId, messageId])
+}
+
+
+
+
+
+
+
+model UserMessage {
+  id        String    @id @default(ulid())
+
+  isRead    Boolean   @default(false)
+
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  messageId String
+  message   Message   @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}
+
+
+model GlobalMessage {
+  id        String  @id @default(ulid())
+
+  messageId String
+  message   Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}
+
+
+
+
+
+
+
+
+model Tutorial {
+  id            String  @id @default(ulid())
+
+  name          String
+
+  createdAt     DateTime  @default(now())
+
+
+  tutorialPages TutorialPage[]
+  stores        Store[]
+}
+
+model TutorialPage {
+  id          String    @id @default(ulid())
+
+  title       String
+  body        String
+
+  index       Int
+
+  imgId       String?
+  img         Image?    @relation(fields: [imgId], references: [id], onDelete: SetNull)
+
+  tutorialId  String
+  tutorial    Tutorial  @relation(fields: [tutorialId], references: [id], onDelete: Cascade)
+
+  langMap     TutorialPageLangMap[]
+}
+
+model TutorialPageLangMap {
+  id              String
+
+  title           String
+  body            String
+
+  tutorialPageId  String
+  tutorialPage    TutorialPage  @relation(fields: [tutorialPageId], references: [id], onDelete: Cascade)
+
+  langId          String
+  lang            Language      @relation(fields: [langId], references: [id], onDelete: Cascade)
+
+
+  @@unique([tutorialPageId, langId])
+}
+
+
+
+
+
+
+
+
+
+model UserVerifyKey {
+  id          String    @id @default(ulid())
+
+  userEmail   String  @unique
+  user_Email  User    @relation(fields: [userEmail], references: [email], onDelete: Cascade)
+
+  key         String    @unique @default(uuid())
+  expiresAt   DateTime
+}
+
+
+model SystemVerifyKey {
+  id        String  @id @default(ulid())
+
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+
+model ServiceKey {
+  id        String  @id @default(ulid())
+
+  name      String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
