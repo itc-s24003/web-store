@@ -1,6 +1,6 @@
 import { AppCrypto } from "@/libs/crypto/crypto";
 import { db } from "../db";
-import { userModels } from ".";
+import { models } from "./type";
 
 export async function login(emailRaw: string) {
     const email = AppCrypto.encrypt(emailRaw);
@@ -22,7 +22,7 @@ export async function login(emailRaw: string) {
 
 
 
-export async function get(email: string): Promise<userModels["model"] | null> {
+export async function get(email: string): Promise<models["model"] | null> {
     return db.user.findUnique({
         where: {
             email
@@ -36,7 +36,7 @@ export async function get(email: string): Promise<userModels["model"] | null> {
 }
 
 
-export async function getDetailMin(email: string): Promise<userModels["detailMin"] | null> {
+export async function getDetailMin(email: string): Promise<models["detailMin"] | null> {
     return db.user.findUnique({
         where: {
             email

@@ -31,6 +31,7 @@ model Image {
   url           String
 
   stores        Store[]
+  productGroups ProductGroup[]
   products      Product[]
   tutorialPages TutorialPage[]
 }
@@ -45,6 +46,7 @@ model Language {
   users           User[]
   
   storeLM         StoreLangMap[]
+  productGroupLM  ProductGroupLangMap[]
   productLM       ProductLangMap[]
   labelLM         LabelLangMap[]
   messageLM       MessageLangMap[]
@@ -98,9 +100,43 @@ model StoreLangMap {
 
 
 
+model ProductGroup {
+  id          String    @id @default(ulid())
+
+  name        String
+
+  showTop     Boolean   @default(false)
+
+  imgId       String?
+  img         Image?    @relation(fields: [imgId], references: [id], onDelete: SetNull)
+
+  products    Product[]
+  langMaps    ProductGroupLangMap[]
+}
+
+model ProductGroupLangMap {
+  id              String    @id @default(ulid())
+
+  name            String
+
+  productGroupId  String
+  productGroup    ProductGroup @relation(fields: [productGroupId], references: [id], onDelete: Cascade)
+
+  langId          String
+  lang            Language  @relation(fields: [langId], references: [id], onDelete: Cascade)
+
+
+  @@unique([productGroupId, langId])
+}
+
+
+
 
 model Product {
   id              String            @id @default(ulid())
+
+  groupId         String
+  group           ProductGroup      @relation(fields: [groupId], references: [id], onDelete: Cascade)
 
   name            String
   description     String
@@ -110,10 +146,8 @@ model Product {
   img             Image?            @relation(fields: [imgId], references: [id], onDelete: SetNull)
 
 
-  showTop         Boolean           @default(false)
-  showStock       Boolean           @default(true)
+  showStockDetail Boolean           @default(true)
   stock           Int               @default(0)
-  stockUpdateTime DateTime          @default(now())
 
   labelId         String?
   label           Label?            @relation(fields: [labelId], references: [id], onDelete: SetNull)
@@ -385,13 +419,13 @@ model TutorialPageLangMap {
 
 
 model UserVerifyKey {
-  id          String    @id @default(ulid())
+  id        String    @id @default(ulid())
 
-  userEmail   String  @unique
-  user_Email  User    @relation(fields: [userEmail], references: [email], onDelete: Cascade)
+  userEmail String  @unique
+  user      User    @relation(fields: [userEmail], references: [email], onDelete: Cascade)
 
-  key         String    @unique @default(uuid())
-  expiresAt   DateTime
+  key       String    @unique @default(uuid())
+  expiresAt DateTime
 }
 
 
