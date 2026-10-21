@@ -14,7 +14,11 @@ datasource db {
 
 
 
-
+generator markdown {
+  provider = "prisma-markdown"
+  output   = "./ERD.md"
+  title    = "Shopping Mall"
+}
 
 
 
