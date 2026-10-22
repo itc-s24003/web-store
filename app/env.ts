@@ -39,13 +39,22 @@ if (!GOOGLE_CLIENT_ID) throw new ENV_Error_NotSet("GOOGLE_CLIENT_ID");
 if (!GOOGLE_CLIENT_SECRET) throw new ENV_Error_NotSet("GOOGLE_CLIENT_SECRET");
 
 
-const Z_VERIFYKEY_LIFE_USER = z.int({message: "VERIFYKEY_LIFE_USER は 整数で指定する必要があります"}).min(1, {message: "VERIFYKEY_LIFE_USER は 1以上を指定する必要があります"}).safeParse(_VERIFYKEY_LIFE_USER);
+const Z_VERIFYKEY_LIFE_USER = z.preprocess(
+    Number,
+    z.int({message: "VERIFYKEY_LIFE_USER は 整数で指定する必要があります"}).min(1, {message: "VERIFYKEY_LIFE_USER は 1以上を指定する必要があります"})
+).safeParse(_VERIFYKEY_LIFE_USER);
 if (!Z_VERIFYKEY_LIFE_USER.success) throw new ENV_Error(Z_VERIFYKEY_LIFE_USER.error.message);
 
-const Z_VERIFYKEY_LIFE_SYSTEM = z.int({message: "VERIFYKEY_LIFE_SYSTEM は 整数で指定する必要があります"}).min(1, {message: "VERIFYKEY_LIFE_SYSTEM は 1以上を指定する必要があります"}).safeParse(_VERIFYKEY_LIFE_SYSTEM);
+const Z_VERIFYKEY_LIFE_SYSTEM = z.preprocess(
+    Number,
+    z.int({message: "VERIFYKEY_LIFE_SYSTEM は 整数で指定する必要があります"}).min(1, {message: "VERIFYKEY_LIFE_SYSTEM は 1以上を指定する必要があります"})
+).safeParse(_VERIFYKEY_LIFE_SYSTEM);
 if (!Z_VERIFYKEY_LIFE_SYSTEM.success) throw new ENV_Error(Z_VERIFYKEY_LIFE_SYSTEM.error.message);
 
-const Z_VERIFYKEY_LIFE_SERVICE = z.int({message: "VERIFYKEY_LIFE_SERVICE は 整数で指定する必要があります"}).min(1, {message: "VERIFYKEY_LIFE_SERVICE は 1以上を指定する必要があります"}).safeParse(_VERIFYKEY_LIFE_SERVICE);
+const Z_VERIFYKEY_LIFE_SERVICE = z.preprocess(
+    Number,
+    z.int({message: "VERIFYKEY_LIFE_SERVICE は 整数で指定する必要があります"}).min(1, {message: "VERIFYKEY_LIFE_SERVICE は 1以上を指定する必要があります"})
+).safeParse(_VERIFYKEY_LIFE_SERVICE);
 if (!Z_VERIFYKEY_LIFE_SERVICE.success) throw new ENV_Error(Z_VERIFYKEY_LIFE_SERVICE.error.message);
 
 
