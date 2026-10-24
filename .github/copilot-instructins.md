@@ -7,7 +7,7 @@
 ├── app/                         # Next.js の画面、API、認証
 │   ├── api/                     # Route Handler と API クライアント
 │   │   └── app/
-│   ├── auth/                    # 認証 Route Handler
+│   │   └── auth/               # 認証 Route Handler
 │   ├── layout.tsx               # ルートレイアウト
 │   ├── page.tsx                 # ルートページ
 │   └── globals.css              # グローバルスタイル
