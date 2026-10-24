@@ -1,7 +1,9 @@
+import * as cartItem from "./cartItem/client"
 import * as user from "./user/client"
 import * as userVerifyKey from "./userVerifyKey/client"
 
 export const API_Client_User = {
+    cartItem,
     user,
     userVerifyKey
 }
