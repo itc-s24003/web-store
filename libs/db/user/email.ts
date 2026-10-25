@@ -70,3 +70,17 @@ export async function getDetailMin(email: string): Promise<models["detailMin"] |
         }
     })
 }
+
+
+
+export async function update(email: string, data: models["update"]) {
+    return db.user.update({
+        where: {
+            email
+        },
+        data,
+        select: {
+            id: true
+        }
+    })
+}
