@@ -7,7 +7,12 @@ type Model_UserUpdate = Partial<
         select: {
             isAdmin: true,
             isStaff: true,
-            lockTime: true
+            lockTime: true,
+
+            subscribe_endpoint: true,
+            subscribe_authKey: true,
+            subscribe_p256dh: true,
+            subscribe_hash: true
         }
     }>
 >

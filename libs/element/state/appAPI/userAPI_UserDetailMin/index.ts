@@ -1,6 +1,6 @@
 import { API_Client } from "@/app/api/app/client";
 import { AppDB_Types } from "@/libs/db";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAPI } from "../../useAPI";
 
 export function useAPI_UserDetailMin() {
@@ -9,6 +9,11 @@ export function useAPI_UserDetailMin() {
         const res = await API_Client.user.user.get();
         if (res?.body.success) setUser(res.body.data);
     })
+
+    useEffect(() => {
+        request();
+    }, [])
+    
 
     return {
         user,

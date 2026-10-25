@@ -1,5 +1,6 @@
 import * as cartItem from "./cartItem"
 import * as image from "./image"
+import * as language from "./language"
 import * as order from "./order"
 import * as product from "./product"
 import * as productGroup from "./productGroup"
@@ -12,6 +13,7 @@ import * as userVerifyKey from "./userVerifyKey"
 export const AppDB = {
     cartItem,
     image,
+    language,
     order,
     product,
     productGroup,
@@ -25,6 +27,7 @@ export const AppDB = {
 export type AppDB_Types = {
     cartItem: cartItem.models,
     image: image.models,
+    language: language.models,
     order: order.models,
     product: product.models,
     productGroup: productGroup.models,
