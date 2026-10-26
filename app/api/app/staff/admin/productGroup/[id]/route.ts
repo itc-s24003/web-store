@@ -25,7 +25,7 @@ const UPDATE_BODY = z.object({
     name: z.string({message: "name は 文字列 で指定する必要があります"}).optional(),
     description: z.string({message: "description は 文字列 で指定する必要があります"}).optional(),
     showTop: z.boolean({message: "showTop は 真偽値 で指定する必要があります"}).optional(),
-    imgId: z.string({message: "imgId は 文字列 で指定する必要があります"}).optional()
+    imgId: z.string({message: "imgId は 文字列 で指定する必要があります"}).nullable().optional()
 }) satisfies z.ZodType<AppDB_Types["productGroup"]["update"]>;
 
 
