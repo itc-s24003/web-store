@@ -29,7 +29,7 @@ const PATCH_BODY = z.object({
     price: z.int({message: "price は 整数で指定する必要があります"}).min(0, {message: "price は 0以上 で指定する必要があります"}).optional(),
     showStockDetail: z.boolean({message: "showStockDetail は 真偽値 で指定する必要があります"}).optional(),
     stock: z.int({message: "stock は 整数 で指定する必要があります"}).min(0, {message: "stock は 0以上 で指定する必要があります"}).optional(),
-    imgId: z.string({message: "imgId は 文字列 で指定する必要があります"}).max(16, {message: "imgId は 16文字以内で指定する必要があります"}).nullable().optional(),
+    imgId: z.string({message: "imgId は 文字列 で指定する必要があります"}).nullable().optional(),
     labelId: z.string({message: "labelId は 文字列 で指定する必要があります"}).max(16, {message: "labelId は 16文字以内で指定する必要があります"}).nullable().optional()
 
 }) satisfies z.ZodType<
@@ -49,8 +49,6 @@ export async function PATCH(req: NextRequest, p: api_url_param_id) {
     }
 
     const { id } = await p.params;
-    const parsedId = z.string().min(1).safeParse(id);
-    if (!parsedId.success) return AppAPI.response.errorResponse.BadRequest;
 
     let body: unknown;
     try {
@@ -63,8 +61,9 @@ export async function PATCH(req: NextRequest, p: api_url_param_id) {
     if (!parsedBody.success) return AppAPI.response.errorResponse.BadRequest;
 
     try {
-        await AppDB.product.update(parsedId.data, parsedBody.data);
-    } catch {
+        await AppDB.product.update(id, parsedBody.data);
+    } catch (e) {
+        console.error(e);
         return AppAPI.response.errorResponse.ServerError;
     }
 
