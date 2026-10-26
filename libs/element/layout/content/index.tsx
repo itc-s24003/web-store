@@ -1,12 +1,10 @@
 export function Content({ className, children, ...props }: React.JSX.IntrinsicElements["div"]) {
     return (
         <div
-            className="flex-1 bg-(--container-background) overflow-y-auto"
+            className="flex-1 flex flex-col bg-(--container-background) overflow-y-auto pb-8 px-4"
             {...props}
         >
-            <div className={`pb-6 px-4 ${className}`}>
-                {children}
-            </div>
+            {children}
         </div>
     )
 }
