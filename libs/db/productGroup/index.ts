@@ -98,11 +98,10 @@ export async function getDetail(id: string): Promise<models["detail"] | null> {
 
 
 
-export async function add(name: string, description: string, showTop: boolean, imgId?: string): Promise<models["detail"]> {
+export async function add(name: string, showTop: boolean, imgId?: string): Promise<models["edit"]> {
     return db.productGroup.create({
         data: {
             name,
-            description,
             showTop,
             imgId
         },
@@ -113,41 +112,14 @@ export async function add(name: string, description: string, showTop: boolean, i
 
             img: {
                 select: {
+                    id: true,
                     url: true
                 }
             },
-            
-            products: {
-                select: {
-                    id: true,
-                    name: true,
-                    description: true,
-                    showStockDetail: true,
-                    price: true,
-                    stock: true,
 
-                    img: {
-                        select: {
-                            url: true
-                        }
-                    },
-                    label: {
-                        select: {
-                            body: true,
-                            color: true
-                        }
-                    },
-                    langMaps: {
-                        select: {
-                            name: true,
-                            description: true,
-                            langId: true
-                        }
-                    }
-                }
-            },
             langMaps: {
                 select: {
+                    id: true,
                     name: true,
                     langId: true
                 }
@@ -177,6 +149,33 @@ export async function update(id: string, data: models["update"]) {
         data,
         select: {
             id: true
+        }
+    })
+}
+
+
+
+export async function getEdit(): Promise<models["edit"][]> {
+    return db.productGroup.findMany({
+        select: {
+            id: true,
+            name: true,
+            showTop: true,
+
+            img: {
+                select: {
+                    id: true,
+                    url: true
+                }
+            },
+
+            langMaps: {
+                select: {
+                    id: true,
+                    name: true,
+                    langId: true
+                }
+            }
         }
     })
 }
