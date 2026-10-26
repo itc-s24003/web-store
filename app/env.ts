@@ -15,6 +15,8 @@ const {
 
     NEXT_PUBLIC_VAPID_PUBLIC,
     VAPID_PRIVATE,
+
+    BLOB_READ_WRITE_TOKEN
 } = process.env;
 
 
@@ -69,6 +71,8 @@ if (!Z_ADMIN_EMAIL.success) throw new ENV_Error(Z_ADMIN_EMAIL.error.message);
 if (!NEXT_PUBLIC_VAPID_PUBLIC) throw new ENV_Error_NotSet("NEXT_PUBLIC_VAPID_PUBLIC");
 if (!VAPID_PRIVATE) throw new ENV_Error_NotSet("VAPID_PRIVATE");
 
+if (!BLOB_READ_WRITE_TOKEN) throw new ENV_Error_NotSet("BLOB_READ_WRITE_TOKEN");
+
 
 
 export const APP_ENV = {
@@ -88,5 +92,7 @@ export const APP_ENV = {
     ADMIN_EMAIL: Z_ADMIN_EMAIL.data,
 
     NEXT_PUBLIC_VAPID_PUBLIC,
-    VAPID_PRIVATE
+    VAPID_PRIVATE,
+
+    BLOB_READ_WRITE_TOKEN
 }

@@ -10,18 +10,16 @@ export type AppAPI_staff_admin_ProductGroup_Map = app_api_map_gen<{
             params: undefined,
             body: {
                 name: string,
-                description: string,
                 showTop: boolean,
                 imgId: string | null
             }
         },
-        res: app_api_response<AppDB_Types["productGroup"]["detail"]>
+        res: app_api_response<AppDB_Types["productGroup"]["edit"]>
     }
 }>;
 
 const POST_BODY = z.object({
     name: z.string({message: "name は 文字列 で指定する必要があります"}),
-    description: z.string({message: "description は 文字列 で指定する必要があります"}),
     showTop: z.boolean({message: "showTop は 真偽値 で指定する必要があります"}),
     imgId: z.string({message: "imgId は 文字列 で指定する必要があります"}).nullable()
 }) satisfies z.ZodType<
@@ -47,7 +45,7 @@ export async function POST(req: NextRequest) {
     }
 
     try {
-        const data = await AppDB.productGroup.add(body.data.name, body.data.description, body.data.showTop, body.data.imgId || undefined);
+        const data = await AppDB.productGroup.add(body.data.name, body.data.showTop, body.data.imgId || undefined);
         return NextResponse.json<
             AppAPI_staff_admin_ProductGroup_Map["POST"]["res"]
         >({ success: true, data });
