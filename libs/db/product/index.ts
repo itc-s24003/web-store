@@ -34,7 +34,7 @@ export async function getTop(): Promise<models["model"][]> {
     })
 }
 
-export async function add(groupId: string, name: string, description: string, price: number): Promise<models["detail"]> {
+export async function add(groupId: string, name: string, description: string, price: number): Promise<models["edit"]> {
     return db.product.create({
         data: {
             groupId,
@@ -48,9 +48,16 @@ export async function add(groupId: string, name: string, description: string, pr
             name: true,
             description: true,
             price: true,
+            showStockDetail: true,
+            stock: true,
+
+            img: {
+                select: {
+                    id: true,
+                    url: true
+                }
+            },
             
-            img: true,
-            label: true,
             langMaps: {
                 select: {
                     id: true,
@@ -83,15 +90,37 @@ export async function update(id: string, data: models["update"]) {
         },
         data,
         select: {
+            id: true
+        }
+    })
+}
+
+export async function getEdit(): Promise<models["edit"][]> {
+    return db.product.findMany({
+        select: {
+            id: true,
+            groupId: true,
             name: true,
             description: true,
             price: true,
-            showTop: true,
-            showStock: true,
+            showStockDetail: true,
             stock: true,
 
-            imgId: true,
-            labelId: true
+            img: {
+                select: {
+                    id: true,
+                    url: true
+                }
+            },
+            
+            langMaps: {
+                select: {
+                    id: true,
+                    name: true,
+                    description: true,
+                    langId: true
+                }
+            }
         }
     })
 }

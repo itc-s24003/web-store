@@ -15,7 +15,7 @@ export type AppAPI_staff_admin_Product_Map = app_api_map_gen<{
                 groupId: string
             }
         },
-        res: app_api_response<AppDB_Types["product"]["detail"]>
+        res: app_api_response<AppDB_Types["product"]["edit"]>
     }
 }>
 

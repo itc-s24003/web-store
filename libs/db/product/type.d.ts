@@ -70,9 +70,39 @@ type Model_ProductDetail = Prisma.ProductGetPayload<{
 }>
 
 
+type Model_ProductEdit = Prisma.ProductGetPayload<{
+    select: {
+        id: true,
+        groupId: true,
+        name: true,
+        description: true,
+        price: true,
+        showStockDetail: true,
+        stock: true,
+
+        img: {
+            select: {
+                id: true,
+                url: true
+            }
+        },
+        
+        langMaps: {
+            select: {
+                id: true,
+                name: true,
+                description: true,
+                langId: true
+            }
+        }
+    }
+}>
+
+
 
 export type models = {
     update: Model_ProductUpdate,
     model: Model_Product,
-    detail: Model_ProductDetail
+    detail: Model_ProductDetail,
+    edit: Model_ProductEdit
 }
