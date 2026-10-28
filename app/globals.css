@@ -5,13 +5,16 @@
   --background-sub: #959596;
 
   --container-background: #f9fafb;
-  --container-background-sub: #d1d5db;
+  --container-background-sub: #b8b8b9;
   
   --text-color: #171717;
   --text-color-sub: #525252;
   
   --app-theme: #db5921;
   --app-theme-sub: #152938;
+
+  --app-theme-background: #152938;
+  --app-theme-background-sub: #294f6d;
   
 
   --app-theme-text: #ffffff;
@@ -39,7 +42,7 @@
 } */
 
 body {
-  background: var(--background-sub);
-  color: var(--text-color);
+  background: var(--app-theme-sub);
+  color: var(--app-theme-text-sub);
   font-family: Arial, Helvetica, sans-serif;
 }

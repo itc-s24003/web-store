@@ -20,7 +20,7 @@ export async function GET() {
     const email = await AppAPI.session.getEmail();
     if (!email) return AppAPI.response.errorResponse.Unauthorized;
 
-    const key = await AppDB.userVerifyKey.email.get(email).catch(() => null);
+    const key = await AppDB.userVerifyKey.email.get(email);
     if (key === null) return AppAPI.response.errorResponse.ServerError;
 
     return NextResponse.json<AppAPI_user_UserVerifyKey_Map["GET"]["res"]>({

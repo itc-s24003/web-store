@@ -16,7 +16,10 @@ const {
     NEXT_PUBLIC_VAPID_PUBLIC,
     VAPID_PRIVATE,
 
-    BLOB_READ_WRITE_TOKEN
+    BLOB_READ_WRITE_TOKEN,
+
+    CLIENT_CACHE,
+    SERVER_CACHE
 } = process.env;
 
 
@@ -50,28 +53,41 @@ const Z_VERIFYKEY_LIFE_USER = z.preprocess(
     Number,
     z.int({message: "VERIFYKEY_LIFE_USER は 整数で指定する必要があります"}).min(1, {message: "VERIFYKEY_LIFE_USER は 1以上を指定する必要があります"})
 ).safeParse(_VERIFYKEY_LIFE_USER);
-if (!Z_VERIFYKEY_LIFE_USER.success) throw new ENV_Error(Z_VERIFYKEY_LIFE_USER.error.message);
+if (!Z_VERIFYKEY_LIFE_USER.success) throw new ENV_Error(Z_VERIFYKEY_LIFE_USER.error.issues.map(issue => issue.message).join(", "));
 
 const Z_VERIFYKEY_LIFE_SYSTEM = z.preprocess(
     Number,
     z.int({message: "VERIFYKEY_LIFE_SYSTEM は 整数で指定する必要があります"}).min(1, {message: "VERIFYKEY_LIFE_SYSTEM は 1以上を指定する必要があります"})
 ).safeParse(_VERIFYKEY_LIFE_SYSTEM);
-if (!Z_VERIFYKEY_LIFE_SYSTEM.success) throw new ENV_Error(Z_VERIFYKEY_LIFE_SYSTEM.error.message);
+if (!Z_VERIFYKEY_LIFE_SYSTEM.success) throw new ENV_Error(Z_VERIFYKEY_LIFE_SYSTEM.error.issues.map(issue => issue.message).join(", "));
 
 const Z_VERIFYKEY_LIFE_SERVICE = z.preprocess(
     Number,
     z.int({message: "VERIFYKEY_LIFE_SERVICE は 整数で指定する必要があります"}).min(1, {message: "VERIFYKEY_LIFE_SERVICE は 1以上を指定する必要があります"})
 ).safeParse(_VERIFYKEY_LIFE_SERVICE);
-if (!Z_VERIFYKEY_LIFE_SERVICE.success) throw new ENV_Error(Z_VERIFYKEY_LIFE_SERVICE.error.message);
+if (!Z_VERIFYKEY_LIFE_SERVICE.success) throw new ENV_Error(Z_VERIFYKEY_LIFE_SERVICE.error.issues.map(issue => issue.message).join(", "));
 
 
 const Z_ADMIN_EMAIL = z.email({message: "ADMIN_EMAIL は メールアドレス形式で指定する必要があります"}).safeParse(_ADMIN_EMAIL);
-if (!Z_ADMIN_EMAIL.success) throw new ENV_Error(Z_ADMIN_EMAIL.error.message);
+if (!Z_ADMIN_EMAIL.success) throw new ENV_Error(Z_ADMIN_EMAIL.error.issues.map(issue => issue.message).join(", "));
 
 if (!NEXT_PUBLIC_VAPID_PUBLIC) throw new ENV_Error_NotSet("NEXT_PUBLIC_VAPID_PUBLIC");
 if (!VAPID_PRIVATE) throw new ENV_Error_NotSet("VAPID_PRIVATE");
 
 if (!BLOB_READ_WRITE_TOKEN) throw new ENV_Error_NotSet("BLOB_READ_WRITE_TOKEN");
+
+const Z_CLIENT_CACHE = z.preprocess(
+    Number,
+    z.int({message: "CLIENT_CACHE は 整数で指定する必要があります"}).min(1, {message: "CLIENT_CACHE は 1以上を指定する必要があります"})
+).safeParse(CLIENT_CACHE);
+if (!Z_CLIENT_CACHE.success) throw new ENV_Error(Z_CLIENT_CACHE.error.issues.map(issue => issue.message).join(", "));
+
+
+const Z_SERVER_CACHE = z.preprocess(
+    Number,
+    z.int({message: "SERVER_CACHE は 整数で指定する必要があります"}).min(1, {message: "SERVER_CACHE は 1以上を指定する必要があります"})
+).safeParse(SERVER_CACHE);
+if (!Z_SERVER_CACHE.success) throw new ENV_Error(Z_SERVER_CACHE.error.issues.map(issue => issue.message).join(", "));
 
 
 
@@ -94,5 +110,9 @@ export const APP_ENV = {
     NEXT_PUBLIC_VAPID_PUBLIC,
     VAPID_PRIVATE,
 
-    BLOB_READ_WRITE_TOKEN
+    BLOB_READ_WRITE_TOKEN,
+
+
+    CLIENT_CACHE: Z_CLIENT_CACHE.data,
+    SERVER_CACHE: Z_SERVER_CACHE.data
 }

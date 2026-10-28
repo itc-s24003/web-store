@@ -5,6 +5,13 @@ import { AppAPI } from "@/libs/api";
 import z from "zod";
 
 export type AppAPI_user_CartItem_Map = app_api_map_gen<{
+    GET: {
+        req: {
+            params: undefined,
+            body: undefined
+        },
+        res: app_api_response<AppDB_Types["cartItem"]["model"][]>
+    },
     POST: {
         req: {
             params: undefined,
@@ -16,6 +23,28 @@ export type AppAPI_user_CartItem_Map = app_api_map_gen<{
         res: app_api_response<AppDB_Types["cartItem"]["model"]>
     }
 }>
+
+
+
+
+export async function GET() {
+    const email = await AppAPI.session.getEmail();
+    if (!email) return AppAPI.response.errorResponse.Unauthorized;
+
+    const permission = await AppAPI.permission.get(email);
+    if (!permission) return AppAPI.response.errorResponse.Unauthorized;
+    if (permission.isLock) return AppAPI.response.errorResponse.Forbidden;
+
+    const cartItems = await AppDB.cartItem.email.getAll(email);
+
+    return NextResponse.json<AppAPI_user_CartItem_Map["GET"]["res"]>({
+        success: true,
+        data: cartItems
+    })
+}
+
+
+
 
 
 const POST_BODY = z.object({
@@ -32,7 +61,7 @@ export async function POST(req: NextRequest) {
     const body = POST_BODY.safeParse(await req.json());
     if (!body.success) return NextResponse.json<app_api_response_error>({
         success: false,
-        error: body.error.message
+        error: body.error.issues.map(issue => issue.message).join(", ")
     }, {status: 500});
     
     const permission = await AppAPI.permission.get(email);

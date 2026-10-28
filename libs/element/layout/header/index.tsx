@@ -7,8 +7,8 @@ import Link from "next/link";
 
 type Header_Props = {
     languages: AppDB_Types["language"]["model"][],
-    userLanguageId: string,
-    onLanguageChange?: (languageId: string) => void,
+    userLanguageId: string | null,
+    onLanguageChange?: (languageId: string | null) => void,
 
     title: string,
     toast?: number
@@ -26,7 +26,7 @@ export function Header({ languages, userLanguageId, onLanguageChange, title, toa
                 </div>
             </div>
             <select
-                value={userLanguageId}
+                value={userLanguageId ?? ""}
                 onChange={(e) => onLanguageChange && onLanguageChange(e.target.value)}
                 className="bg-transparent text-sm font-medium text-(--app-theme-text) focus:outline-none"
             >

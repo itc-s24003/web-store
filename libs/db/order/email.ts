@@ -26,15 +26,22 @@ export async function add(email: string, cartItemIds: string[]) {
                     select: {
                         product: {
                             select: {
-                                id: true,
-                                showStock: true
+                                id: true
                             }
                         },
                         count: true
                     }
+                },
+                _count: {
+                    select: {
+                        cartItems: true
+                    }
                 }
             }
         });
+
+        if (order._count.cartItems === 0) throw new Error("カートに商品が存在しません");
+        if (order._count.cartItems !== cartItemIds.length) throw new Error("カートに存在しない商品が含まれています");
 
         for (const item of order.cartItems) {
             const product = await tx.product.update({
@@ -102,3 +109,55 @@ export async function cancel(email: string, id: string) {
 }
 
 
+
+
+export async function getAll(email: string, hasReceived?: boolean): Promise<models["model"][]> {
+    return db.order.findMany({
+        where: {
+            user: {
+                email
+            },
+            isReceived: hasReceived
+        },
+        select: {
+            id: true,
+            index: true,
+            isCanceled: true,
+            isReceived: true,
+            isReady: true,
+            requestedAt: true,
+            cartItems: {
+                select: {
+                    id: true,
+                    count: true,
+                    product: {
+                        select: {
+                            id: true,
+                            name: true,
+                            price: true,
+                            img: {
+                                select: {
+                                    url: true
+                                }
+                            },
+                            langMaps: {
+                                select: {
+                                    name: true,
+                                    langId: true
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            _count: {
+                select: {
+                    cartItems: true
+                }
+            }
+        },
+        orderBy: {
+            requestedAt: "asc"
+        }
+    })
+}

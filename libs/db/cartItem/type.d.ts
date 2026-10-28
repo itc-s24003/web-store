@@ -12,11 +12,13 @@ type Model_CartItemUpdate = Partial<
 type Model_CartItem = Prisma.CartItemGetPayload<{
     select: {
         id: true,
+        count: true,
         product: {
             select: {
                 id: true,
                 name: true,
                 description: true,
+                price: true,
 
                 img: {
                     select: {

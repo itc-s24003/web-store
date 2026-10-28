@@ -11,7 +11,8 @@ export async function get(email: string): Promise<models["model"]> {
             userEmail: email
         },
         update: {
-            key: crypto.randomUUID()
+            key: crypto.randomUUID(),
+            expiresAt
         },
         create: {
             userEmail: email,

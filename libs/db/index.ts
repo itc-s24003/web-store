@@ -3,6 +3,7 @@ import * as image from "./image"
 import * as language from "./language"
 import * as order from "./order"
 import * as product from "./product"
+import * as _custom from "./_custom"
 import * as productGroup from "./productGroup"
 import * as serviceKey from "./serviceKey"
 import * as store from "./store"
@@ -11,6 +12,7 @@ import * as user from "./user"
 import * as userVerifyKey from "./userVerifyKey"
 
 export const AppDB = {
+    _custom,
     cartItem,
     image,
     language,

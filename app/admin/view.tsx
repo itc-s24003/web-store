@@ -1,16 +1,12 @@
 "use client";
 
 import { AppDB_Types } from "@/libs/db";
-import { Button } from "@/libs/element/button";
-import { Picker_Image } from "@/libs/element/form/picker/image";
 import { AppView } from "@/libs/element/layout";
 import { Content } from "@/libs/element/layout/content";
 import { ContentWrapper } from "@/libs/element/layout/contentWrapper";
 import { Header } from "@/libs/element/layout/header";
 import { Navigation } from "@/libs/element/layout/navigation";
-import React, { useState } from "react";
-import { API_Client } from "../api/app/client";
-import { Popup } from "@/libs/element/popup";
+import { useState } from "react";
 import { Editor_ProductGroup } from "./editor/productGroup";
 import { Editor_Product } from "./editor/product";
 
@@ -62,20 +58,5 @@ export function PageView({ languages, images, productGroups, products }: PageVie
                 <Navigation />
             </ContentWrapper>
         </AppView>
-    )
-}
-
-
-function CustomButton({className, ...props}: React.JSX.IntrinsicElements["button"]) {
-    return (
-        <Button
-            className={
-                [
-                    "p-2 px-4 border rounded-md",
-                    className
-                ].join(" ")
-            }
-            {...props}
-        />
     )
 }

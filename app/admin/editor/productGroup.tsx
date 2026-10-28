@@ -74,7 +74,7 @@ export function Editor_ProductGroup({ productGroups, onChangeData, ...props }: E
                                 <ArrowLeft />
                             </Button>
                         </div>
-                        <div className="p-4 rounded-xl border shrink-1 size-fit">
+                        <div className="p-4 rounded-xl border shrink-1 size-fit bg-(--container-background)">
                             <Image src={target.img?.url || "/picture.png"} alt={""} width={300} height={300} className="aspect-square object-cover" onClick={() => setShowImagePicker(true)}/>
                             <div className="flex flex-col gap-2 pt-2">
                                 <Label>

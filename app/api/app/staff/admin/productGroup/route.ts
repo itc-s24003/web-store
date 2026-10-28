@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
     if (!body.success) {
         return NextResponse.json<app_api_response_error>({
             success: false,
-            error: body.error.message
+            error: body.error.issues.map(issue => issue.message).join(", ")
         }, { status: 400 });
     }
 

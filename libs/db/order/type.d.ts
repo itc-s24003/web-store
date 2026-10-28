@@ -20,6 +20,31 @@ type Model_Order = Prisma.OrderGetPayload<{
         isCanceled: true,
         isReceived: true,
         isReady: true,
+        requestedAt: true,
+        cartItems: {
+            select: {
+                id: true,
+                count: true,
+                product: {
+                    select: {
+                        id: true,
+                        name: true,
+                        price: true,
+                        img: {
+                            select: {
+                                url: true
+                            }
+                        },
+                        langMaps: {
+                            select: {
+                                name: true,
+                                langId: true
+                            }
+                        }
+                    }
+                }
+            }
+        },
         _count: {
             select: {
                 cartItems: true

@@ -40,7 +40,7 @@ export async function PATCH(req: NextRequest, p: api_url_param_id) {
     const body = PATCH_BODY.safeParse(await req.json());
     if (!body.success) return NextResponse.json<app_api_response_error>({
         success: false,
-        error: body.error.message
+        error: body.error.issues.map(issue => issue.message).join(", ")
     });
     
     const permission = await AppAPI.permission.get(email);
@@ -64,12 +64,6 @@ export async function DELETE(req: NextRequest, p: api_url_param_id) {
     if (!email) return AppAPI.response.errorResponse.Unauthorized;
 
     const id = (await p.params).id;
-
-    const body = PATCH_BODY.safeParse(await req.json());
-    if (!body.success) return NextResponse.json<app_api_response_error>({
-        success: false,
-        error: body.error.message
-    });
     
     const permission = await AppAPI.permission.get(email);
     if (!permission) return AppAPI.response.errorResponse.Unauthorized;

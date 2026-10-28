@@ -65,11 +65,13 @@ export async function add(email: string, productId: string, count: number): Prom
             },
             select: {
                 id: true,
+                count: true,
                 product: {
                     select: {
                         id: true,
                         name: true,
                         description: true,
+                        price: true,
 
                         img: {
                             select: {
@@ -112,11 +114,13 @@ export async function add(email: string, productId: string, count: number): Prom
             },
             select: {
                 id: true,
+                count: true,
                 product: {
                     select: {
                         id: true,
                         name: true,
                         description: true,
+                        price: true,
 
                         img: {
                             select: {
@@ -165,7 +169,7 @@ export async function remove(email: string, id: string) {
 
 
 export async function update(email: string, id: string, data: models["update"]) {
-    if (data.count ?? 1 < 1) throw new Error("購入数を1未満にすることはできません");
+    if ((data.count ?? 1) < 1) throw new Error("購入数を1未満にすることはできません");
 
     return db.cartItem.update({
         where: {
@@ -193,11 +197,13 @@ export async function getAll(email: string): Promise<models["model"][]> {
         },
         select: {
             id: true,
+            count: true,
             product: {
                 select: {
                     id: true,
                     name: true,
                     description: true,
+                    price: true,
 
                     img: {
                         select: {

@@ -8,10 +8,16 @@ export function useServiceWorker() {
     const [dataQueue, setDataQueue] = useState<ServiceWorkerData[]>([]);
     
     useEffect(() => {
-        navigator.serviceWorker.addEventListener("message", (ev) => {
+        function onServiceWorkerMessage(ev: MessageEvent) {
             const data = ev.data as ServiceWorkerData;
             setDataQueue((prev) => [...prev, data]);
-        })
+        }
+
+        navigator.serviceWorker.addEventListener("message", onServiceWorkerMessage);
+
+        return () => {
+            navigator.serviceWorker.removeEventListener("message", onServiceWorkerMessage);
+        }
     }, [])
 
     function clearQueue() {

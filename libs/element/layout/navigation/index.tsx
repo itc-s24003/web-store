@@ -5,7 +5,7 @@ import { Home, Notebook, QrCode, ShoppingCart, User } from "lucide-react";
 export function Navigation() {
     
     return (
-        <div className="bg-(--app-theme-sub)">
+        <div className="bg-(--app-theme-background)">
             <div
                 className={
                     [
@@ -14,30 +14,30 @@ export function Navigation() {
                     ].join(" ")
                 }
             >
-                <NavigationLink href="/" className="bg-(--container-background-sub) text-(--text-color-sub) hover:bg-(--background-sub)">
+                <NavigationLink href="/" className="bg-(--app-theme-background-sub) text-(--app-theme-text) hover:bg-(--background-sub)">
                     <Home className="sm:hidden"/>
                     <span>HOME</span>
                 </NavigationLink>
-                <NavigationLink href="/cart" className="bg-(--container-background-sub) text-(--text-color-sub) hover:bg-(--background-sub)">
+                <NavigationLink href="/cart" className="bg-(--app-theme-background-sub) text-(--app-theme-text) hover:bg-(--background-sub)">
                     <ShoppingCart className="sm:hidden"/>
                     <span>CART</span>
                 </NavigationLink>
                 <NavigationLink href="/verify"
                     className={
                         [
-                            "-mt-8 h-20 w-20 bg-(--app-theme) font-bold text-(--background) hover:bg-(--secondary)",
-                            "sm:-mt-0 sm:rounded-none sm:bg-(--container-background-sub) sm:text-(--text-color-sub) sm:hover:bg-(--secondary)",
+                            "-mt-8 h-20 w-20 bg-(--app-theme) font-bold text-(--app-theme-text) hover:bg-(--background-sub)",
+                            "sm:-mt-0 sm:rounded-none sm:bg-(--app-theme-background-sub)",
                         ].join(" ")
                     }
                 >
                     <QrCode size={32} className="sm:hidden"/>
                     <span>VERIFY</span>
                 </NavigationLink>
-                <NavigationLink href="/order" className="bg-(--container-background-sub) text-(--text-color-sub) hover:bg-(--background-sub)">
+                <NavigationLink href="/order" className="bg-(--app-theme-background-sub) text-(--app-theme-text) hover:bg-(--background-sub)">
                     <Notebook className="sm:hidden"/>
                     <span>ORDER</span>
                 </NavigationLink>
-                <NavigationLink href="/user" className="bg-(--container-background-sub) text-(--text-color-sub) hover:bg-(--background-sub)">
+                <NavigationLink href="/user" className="bg-(--app-theme-background-sub) text-(--app-theme-text) hover:bg-(--background-sub)">
                     <User className="sm:hidden"/>
                     <span>USER</span>
                 </NavigationLink>
