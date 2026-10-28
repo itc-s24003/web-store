@@ -9,6 +9,8 @@ import { Navigation } from "@/libs/element/layout/navigation";
 import { useState } from "react";
 import { Editor_ProductGroup } from "./editor/productGroup";
 import { Editor_Product } from "./editor/product";
+import { useAPI } from "@/libs/element/state/useAPI";
+import { API_Client } from "../api/app/client";
 
 type PageView_Props = {
     languages: AppDB_Types["language"]["model"][],
@@ -27,6 +29,12 @@ export function PageView({ languages, images, productGroups, products }: PageVie
 
     const [editorId, setEditorId] = useState<EditorId>("productGroup");
     
+    const upload = useAPI(async (file: File) => {
+        const res = await API_Client.staff.admin.image.add(file);
+        if (res?.body.success) {
+            setAllImages([...allImages, res.body.data]);
+        }
+    })
     return (
         <AppView>
             <Header languages={languages} userLanguageId={""} title={""} />
@@ -52,6 +60,7 @@ export function PageView({ languages, images, productGroups, products }: PageVie
                         images={allImages} products={allProducts} onChangeData={(products) => {
                             setAllProducts(products);
                         }}
+                        onUploadImage={(file) => upload.request(file)}
                     />
                     
                 </Content>
