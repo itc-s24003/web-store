@@ -2,7 +2,7 @@ import { db } from "../db";
 import { models } from "./type";
 
 
-export async function getQueue(startId?: string): Promise<models["orderMin"][]> {
+export async function getQueue(startId?: string): Promise<models["model"][]> {
     return db.order.findMany({
         where: {
             id: {
@@ -15,29 +15,41 @@ export async function getQueue(startId?: string): Promise<models["orderMin"][]> 
             requestedAt: "asc"
         },
         select: {
-            id: true,
-            index: true,
-            isCanceled: true,
-            isReceived: true,
-            isReady: true,
-            cartItems: {
-                select: {
-                    id: true,
-                    count: true,
-                    product: {
-                        select: {
-                            name: true,
-                            price: true,
-                            langMaps: {
-                                select: {
-                                    langId: true,
-                                    name: true
-                                }
+        id: true,
+        index: true,
+        isCanceled: true,
+        isReceived: true,
+        isReady: true,
+        requestedAt: true,
+        cartItems: {
+            select: {
+                id: true,
+                count: true,
+                product: {
+                    select: {
+                        id: true,
+                        name: true,
+                        price: true,
+                        img: {
+                            select: {
+                                url: true
+                            }
+                        },
+                        langMaps: {
+                            select: {
+                                name: true,
+                                langId: true
                             }
                         }
                     }
                 }
             }
+        },
+        _count: {
+            select: {
+                cartItems: true
+            }
+        }
         }
     })
 }

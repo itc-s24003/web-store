@@ -14,25 +14,29 @@ export function Display_Product({ href, imgSrc, name, price, description, classN
     return (
         <div {...props} className={
             [
-                "flex gap-2 p-3 border border-(--text-color-sub)/60 rounded-md bg-(--container-background) shadow-md max-w-md min-w-xs",
+                "overflow-hidden rounded-2xl border border-(--container-background-sub)/70 bg-(--container-background) shadow-sm max-w-md min-w-xs",
                 "sm:min-w-md",
                 className
             ].join(" ")
         }>
-            <Image src={imgSrc ?? "/picture.png"} alt={name} width={100} height={100} className="w-3/7 aspect-square object-cover" />
-            <div className="flex flex-col gap-1 flex-1">
-                {
-                    href ? (
-                        <Link href={href} className="text-2xl font-semibold text-(--primary) hover:underline">
-                            <h3 className="text-2xl font-semibold">{name}</h3>
-                        </Link>
-                    ) : (
-                        <h3 className="text-2xl font-semibold">{name}</h3>
-                    )
-                }
-                <p hidden={description===undefined} className="text-gray-500">{description}</p>
-                <p hidden={price===undefined} className="text-lg text-gray-700 font-bold">¥{price}</p>
-                {children}
+            <div className="flex gap-3 p-3 sm:p-4">
+                <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-(--container-background-sub) sm:h-28 sm:w-28">
+                    <Image src={imgSrc ?? "/picture.png"} alt={name} fill sizes="112px" className="object-cover" />
+                </div>
+                <div className="flex min-w-0 flex-1 flex-col gap-2">
+                    {
+                        href ? (
+                            <Link href={href} className="min-w-0 text-(--text-color) hover:underline">
+                                <h3 className="truncate text-lg font-bold">{name}</h3>
+                            </Link>
+                        ) : (
+                            <h3 className="truncate text-lg font-bold text-(--text-color)">{name}</h3>
+                        )
+                    }
+                    <p hidden={description === undefined} className="text-sm text-(--text-color-sub)">{description}</p>
+                    <p hidden={price === undefined} className="font-bold text-(--app-theme)">¥{price?.toLocaleString()}</p>
+                    {children}
+                </div>
             </div>
         </div>
     )
