@@ -78,5 +78,6 @@ export async function cancel(id: string) {
 
 export * as email from "./email";
 export * as userId from "./userId";
+export * as userVerifyKey from "./userVerifyKey";
 
 export type { models } from "./type";
