@@ -1,10 +1,11 @@
 import jsQR from "jsqr";
 import { RefObject, useState } from "react";
 
-export function useQR_Reader(canvas: RefObject<HTMLCanvasElement | null>, onRead?: (code: string) => void) {
+export function useQR_Reader(canvas: RefObject<HTMLCanvasElement | null>, onRead?: (code: string) => void, blockResults: boolean = false) {
     const [qrText, setQRText] = useState<string | null>(null);
 
     function readQRCode() {
+        if (blockResults && qrText) return;
         if (!canvas.current) return;
         const ctx = canvas.current.getContext("2d");
         if (!ctx) return;
@@ -16,10 +17,12 @@ export function useQR_Reader(canvas: RefObject<HTMLCanvasElement | null>, onRead
         if (code) {
             setQRText(code.data);
             onRead?.(code.data);
-        } else {
-            setQRText(null);
         }
     }
 
-    return { qrText, readQRCode }
+    function clearResult() {
+        setQRText(null);
+    }
+
+    return { qrText, readQRCode, clearResult };
 }
