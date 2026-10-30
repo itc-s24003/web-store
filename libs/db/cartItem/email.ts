@@ -72,7 +72,8 @@ export async function add(email: string, productId: string, count: number): Prom
                         name: true,
                         description: true,
                         price: true,
-
+                        stock: true,
+                        showStockDetail: true,
                         img: {
                             select: {
                                 url: true
@@ -121,7 +122,8 @@ export async function add(email: string, productId: string, count: number): Prom
                         name: true,
                         description: true,
                         price: true,
-
+                        stock: true,
+                        showStockDetail: true,
                         img: {
                             select: {
                                 url: true
@@ -204,7 +206,8 @@ export async function getAll(email: string): Promise<models["model"][]> {
                     name: true,
                     description: true,
                     price: true,
-
+                    stock: true,
+                    showStockDetail: true,
                     img: {
                         select: {
                             url: true

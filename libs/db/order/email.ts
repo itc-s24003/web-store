@@ -1,5 +1,17 @@
+import { Prisma } from "@/libs/generated/prisma/client";
 import { db } from "../db";
 import { models } from "./type";
+
+type Order_Filter = Partial<
+    Prisma.OrderGetPayload<{
+        select: {
+            isCanceled: true,
+            isReady: true,
+            isReceived: true
+        }
+    }>
+>
+
 
 export async function add(email: string, cartItemIds: string[]) {
     return await db.$transaction(async tx => {
@@ -111,13 +123,13 @@ export async function cancel(email: string, id: string) {
 
 
 
-export async function getAll(email: string, hasReceived?: boolean): Promise<models["model"][]> {
+export async function getAll(email: string, filter: Order_Filter): Promise<models["model"][]> {
     return db.order.findMany({
         where: {
             user: {
                 email
             },
-            isReceived: hasReceived
+            ...filter
         },
         select: {
             id: true,
@@ -158,6 +170,56 @@ export async function getAll(email: string, hasReceived?: boolean): Promise<mode
         },
         orderBy: {
             requestedAt: "asc"
+        }
+    })
+}
+
+
+
+export async function get(email: string, id: string): Promise<models["model"] | null> {
+    return db.order.findFirst({
+        where: {
+            id,
+            user: {
+                email
+            }
+        },
+        select: {
+            id: true,
+            index: true,
+            isCanceled: true,
+            isReceived: true,
+            isReady: true,
+            requestedAt: true,
+            cartItems: {
+                select: {
+                    id: true,
+                    count: true,
+                    product: {
+                        select: {
+                            id: true,
+                            name: true,
+                            price: true,
+                            img: {
+                                select: {
+                                    url: true
+                                }
+                            },
+                            langMaps: {
+                                select: {
+                                    name: true,
+                                    langId: true
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            _count: {
+                select: {
+                    cartItems: true
+                }
+            }
         }
     })
 }
