@@ -24,8 +24,7 @@ export default async function Page() {
     if (!permission) redirect("/login");
     if (permission.isLock) forbidden();
 
-    const cartItems = await AppDB.cartItem.email.getAll(email);
-    const languages = await AppDB.language.getAll();
+    const base = await AppDB._custom.base.getCache();
 
-    return <PageView cartItems={cartItems} languages={languages} />
+    return <PageView {...base} />
 }

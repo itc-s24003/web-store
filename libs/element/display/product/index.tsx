@@ -20,8 +20,8 @@ export function Display_Product({ href, imgSrc, name, price, description, classN
             ].join(" ")
         }>
             <div className="flex gap-3 p-3 sm:p-4">
-                <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-(--container-background-sub) sm:h-28 sm:w-28">
-                    <Image src={imgSrc ?? "/picture.png"} alt={name} fill sizes="112px" className="object-cover" />
+                <div className="relative shrink-0 overflow-hidden">
+                    <Image src={imgSrc ?? "/picture.png"} alt={name} width={200} height={200} className="aspect-square h-full w-auto max-h-50 object-cover rounded-lg" />
                 </div>
                 <div className="flex min-w-0 flex-1 flex-col gap-2">
                     {

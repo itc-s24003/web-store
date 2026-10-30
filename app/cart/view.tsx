@@ -12,25 +12,18 @@ import { useAPI } from "@/libs/element/state/useAPI";
 import { LoaderCircle, Minus, Plus, ReceiptText, ShoppingCart, Trash } from "lucide-react";
 import { API_Client } from "../api/app/client";
 import { useEffect, useState } from "react";
-import { useServiceWorker } from "@/libs/element/state/useServiceWorker";
 import Image from "next/image";
 
 type PageView_Props = {
-    languages: AppDB_Types["language"]["model"][],
-    cartItems: AppDB_Types["cartItem"]["model"][],
+    store: AppDB_Types["store"]["model"],
+    languages: AppDB_Types["language"]["model"][]
 }
 
-export function PageView({ languages, cartItems }: PageView_Props) {
-    const [initData, setInitData] = useState(cartItems);
-    const [allCartItems, setAllCartItems] = useState<AppDB_Types["cartItem"]["model"][]>(cartItems);
+export function PageView({ store, languages }: PageView_Props) {
+    const [allCartItems, setAllCartItems] = useState<AppDB_Types["cartItem"]["model"][]>([]);
     
     
     const total = allCartItems.reduce((acc, item) => acc + (item.product.price * item.count), 0);
-
-    if (initData !== cartItems) {
-        setInitData(cartItems);
-        setAllCartItems(cartItems);
-    }
 
 
     const get = useAPI(async () => {
@@ -39,18 +32,10 @@ export function PageView({ languages, cartItems }: PageView_Props) {
             setAllCartItems(res.body.data);
         }
     })
-    
-    const { dataQueue, clearQueue } = useServiceWorker();
+
     useEffect(() => {
-        if (dataQueue.length > 0) {
-            dataQueue.forEach((data) => {
-                if (data.type === "update" && data.data.target === "cart") {
-                    get.request();
-                }
-            });
-            clearQueue();
-        }
-    }, [dataQueue, clearQueue, get]);
+        get.request();
+    }, [])
     
     
     
@@ -64,7 +49,7 @@ export function PageView({ languages, cartItems }: PageView_Props) {
     
     return (
         <AppView>
-            <Header languages={languages} userLanguageId={""} title={""} />
+            <Header languages={languages} userLanguageId={null} title={store.name} />
             <ContentWrapper>
                 <Content>
                     <div className="mx-auto flex w-full max-w-2xl flex-col gap-4 py-5">
@@ -78,7 +63,13 @@ export function PageView({ languages, cartItems }: PageView_Props) {
                             </span>
                         </div>
 
-                        {allCartItems.length === 0 ? (
+                        {get.waiting ? (
+                            <div className="flex flex-col items-center justify-center rounded-2xl border border-(--container-background-sub) bg-(--container-background) px-6 py-16 text-center shadow-sm">
+                                <LoaderCircle size={42} strokeWidth={1.5} className="animate-spin text-(--app-theme-sub)/60" />
+                                <h2 className="mt-4 text-lg font-bold text-(--text-color)">取得中...</h2>
+                                <p className="mt-1 text-sm text-(--text-color-sub)">カートの内容を読み込んでいます。</p>
+                            </div>
+                        ) : allCartItems.length === 0 ? (
                             <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-(--container-background-sub) bg-(--container-background) px-6 py-16 text-center shadow-sm">
                                 <ReceiptText size={42} strokeWidth={1.5} className="text-(--app-theme-sub)/45" />
                                 <h2 className="mt-4 text-lg font-bold text-(--text-color)">カートは空です</h2>
@@ -166,7 +157,18 @@ function CartItem({ cartItem, onUpdate, onRemove }: CartItem_Props) {
                     <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0">
                             <h2 className="truncate text-lg font-bold text-(--text-color)">{cartItem.product.name}</h2>
-                            <p className="mt-1 text-sm text-(--text-color-sub)">¥{cartItem.product.price.toLocaleString()} / 個</p>
+                            <p className="mt-1 text-sm text-(--text-color-sub)">¥{cartItem.product.price} / 個</p>
+
+                            <p className="mt-1 text-sm text-(--text-color-sub)">
+                                {
+                                    cartItem.product.showStockDetail ? (
+                                        `在庫: ${cartItem.product.stock}個`
+                                    ) : (
+                                        `予定在庫数: ${cartItem.product.stock}個`
+                                    )
+                                }
+                                <span hidden={cartItem.count <= cartItem.product.stock} className="text-sm text-red-500">※在庫数が不足しています</span>
+                            </p>
                         </div>
                         <p className="shrink-0 font-bold text-(--app-theme)">¥{(cartItem.product.price * cartItem.count).toLocaleString()}</p>
                     </div>

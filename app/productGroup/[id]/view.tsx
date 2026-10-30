@@ -55,17 +55,25 @@ type ProductView_Props = {
 
 function ProductView({ product, ...props }: ProductView_Props) {
     const [count, setCount] = useState<number>(1);
+    const [success, setSuccess] = useState<boolean>(true);
     const addCart = useAPI(async () => {
         const res = await API_Client.user.cartItem.add({
             productId: product.id,
             count
         })
+        setSuccess(res?.body.success ?? false);
     })
     
     
     return (
         <Display_Product key={product.id} name={product.name} imgSrc={product.img?.url} price={product.price} {...props}>
             <div className="flex-1 flex flex-col gap-2 justify-end">
+                <p>
+                    {
+                        product.showStockDetail ? "在庫: " : "予定在庫: "
+                    }
+                    {product.stock}個
+                </p>
                 <Select value={count} onChange={(e) => setCount(Number(e.target.value))} className="text-lg">
                     {
                         Array.from({ length: 5 }, (_, i) => i + 1).map((n) => (
@@ -73,10 +81,11 @@ function ProductView({ product, ...props }: ProductView_Props) {
                         ))
                     }
                 </Select>
+                <label hidden={success} className="text-sm text-red-500">※追加に失敗しました</label>
                 <Button onClick={() => addCart.request()} className="rounded-full w-full bg-(--app-theme) text-(--app-theme-text)">
                     <div className="bg-white/5 p-2 rounded-full">
                         {
-                            addCart.waiting ? "追加中..." : "カートに追加"
+                            addCart.waiting ? "追加中...": "カートに追加"
                         }
                     </div>
                 </Button>
