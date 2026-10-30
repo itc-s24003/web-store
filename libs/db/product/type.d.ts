@@ -25,7 +25,8 @@ type Model_Product = Prisma.ProductGetPayload<{
         name: true,
         description: true,
         price: true,
-
+        stock: true,
+        showStockDetail: true,
         img: {
             select: {
                 url: true

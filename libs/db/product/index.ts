@@ -11,6 +11,8 @@ export async function getTop(): Promise<models["model"][]> {
             name: true,
             description: true,
             price: true,
+            stock: true,
+            showStockDetail: true,
             
             img: {
                 select: {
