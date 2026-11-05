@@ -8,13 +8,13 @@ import { ContentWrapper } from "@/libs/element/layout/contentWrapper";
 import { Header } from "@/libs/element/layout/header";
 import { Navigation } from "@/libs/element/layout/navigation";
 import { useAPI } from "@/libs/element/state/useAPI";
-import { CheckCircle2, Clock3, PackageCheck, ReceiptText } from "lucide-react";
+import { CheckCircle2, Clock3, LoaderCircle, PackageCheck, ReceiptText } from "lucide-react";
 import Image from "next/image";
 import { API_Client } from "../api/app/client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useWebPush } from "@/libs/element/state/useWebPush";
 import { useServiceWorker } from "@/libs/element/state/useServiceWorker";
+import { Button } from "@/libs/element/button";
 
 type PageView_Props = {
     store: AppDB_Types["store"]["model"],
@@ -63,8 +63,8 @@ export function PageView({ store, languages }: PageView_Props) {
 
                         {
                             get.waiting ? (
-                                <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-(--container-background-sub) bg-(--container-background) px-6 py-16 text-center shadow-sm">
-                                    <Clock3 size={42} strokeWidth={1.5} className="text-(--app-theme-sub)/45" />
+                                <div className="flex flex-col items-center justify-center rounded-2xl border border-(--container-background-sub) bg-(--container-background) px-6 py-16 text-center shadow-sm">
+                                    <LoaderCircle size={42} strokeWidth={1.5} className="animate-spin text-(--app-theme-sub)/60" />
                                     <h2 className="mt-4 text-lg font-bold text-(--text-color)">注文履歴を取得中</h2>
                                     <p className="mt-1 text-sm text-(--text-color-sub)">しばらくお待ちください。</p>
                                 </div>
@@ -74,62 +74,96 @@ export function PageView({ store, languages }: PageView_Props) {
                                     <h2 className="mt-4 text-lg font-bold text-(--text-color)">注文履歴はありません</h2>
                                     <p className="mt-1 text-sm text-(--text-color-sub)">注文すると、ここに履歴が表示されます。</p>
                                 </div>
-                            ) : orders.map((order) => {
-                                const total = order.cartItems.reduce((acc, item) => acc + (item.product.price * item.count), 0);
-                                const status = order.isReceived
-                                    ? { label: "受け取り済み", icon: <CheckCircle2 size={15} />, className: "bg-(--success)/12 text-(--success)" }
-                                    : order.isReady
-                                        ? { label: "準備完了", icon: <PackageCheck size={15} />, className: "bg-(--app-theme)/12 text-(--app-theme)" }
-                                        : { label: "準備中", icon: <Clock3 size={15} />, className: "bg-(--app-theme-sub)/10 text-(--app-theme-sub)" };
-
-                                return (
-                                    <Link href={`/order/${order.id}`} key={order.id} className="block overflow-hidden rounded-2xl border border-(--container-background-sub)/70 bg-(--container-background) shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
-                                        <div className="flex items-start justify-between gap-3 border-b border-(--container-background-sub)/60 px-4 py-4 sm:px-5">
-                                            <div>
-                                                <p className="text-xs font-semibold tracking-wider text-(--text-color-sub)">ORDER</p>
-                                                <h2 className="mt-0.5 text-xl font-bold text-(--text-color)">#{order.index}</h2>
-                                            </div>
-                                            <span className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold ${status.className}`}>
-                                                {status.icon}
-                                                {status.label}
-                                            </span>
-                                        </div>
-                                        <div className="grid grid-cols-2 gap-3 px-4 py-3 text-sm sm:px-5">
-                                            <div>
-                                                <p className="text-xs text-(--text-color-sub)">注文日時</p>
-                                                <time dateTime={new Date(order.requestedAt).toISOString()} className="mt-0.5 block font-medium text-(--text-color)">
-                                                    {new Date(order.requestedAt).toLocaleString()}
-                                                </time>
-                                            </div>
-                                            <div className="text-right">
-                                                <p className="text-xs text-(--text-color-sub)">合計金額</p>
-                                                <p className="mt-0.5 text-lg font-bold text-(--app-theme)">¥{total.toLocaleString()}</p>
-                                            </div>
-                                        </div>
-                                        <div className="flex flex-col gap-2 bg-(--background) px-4 py-3 sm:px-5">
-                                            {
-                                                order.cartItems.map((item) => (
-                                                    <div key={item.id} className="flex items-center gap-3 rounded-xl bg-(--container-background) p-2.5">
-                                                        <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-(--container-background-sub)">
-                                                            <Image src={item.product.img?.url ?? "/picture.png"} alt={item.product.name} fill sizes="56px" className="object-cover" />
-                                                        </div>
-                                                        <div className="min-w-0 flex-1">
-                                                            <p className="truncate font-bold text-(--text-color)">{item.product.name}</p>
-                                                            <p className="mt-1 text-sm text-(--text-color-sub)">数量 {item.count}</p>
-                                                        </div>
-                                                        <p className="text-sm font-semibold text-(--text-color)">¥{(item.product.price * item.count).toLocaleString()}</p>
-                                                    </div>
-                                                ))
-                                            }
-                                        </div>
-                                    </Link>
-                                )
-                            })
+                            ) : orders.map((order) => (
+                                <OrderView key={order.id} order={order} onCancel={() => {
+                                    setOrders((prev) => prev.filter((o) => o.id !== order.id));
+                                }} />
+                            ))
                         }
                     </div>
                 </Content>
                 <Navigation />
             </ContentWrapper>
         </AppView>
+    )
+}
+
+
+
+
+type OrderView_Props = {
+    order: AppDB_Types["order"]["model"],
+    onCancel: () => void
+}
+
+function OrderView({ order, onCancel }: OrderView_Props) {
+    const cancel = useAPI(async () => {
+        const res = await API_Client.user.order.cancel(order.id);
+        if (res?.body.success) onCancel();
+    })
+    
+    
+    const total = order.cartItems.reduce((acc, item) => acc + (item.product.price * item.count), 0);
+    const status = order.isReceived
+        ? { label: "受け取り済み", icon: <CheckCircle2 size={15} />, className: "bg-(--success)/12 text-(--success)" }
+        : order.isReady
+            ? { label: "準備完了", icon: <PackageCheck size={15} />, className: "bg-(--app-theme)/12 text-(--app-theme)" }
+            : { label: "準備中", icon: <Clock3 size={15} />, className: "bg-(--app-theme-sub)/10 text-(--app-theme-sub)" };
+
+    return (
+        <Link href={`/order/${order.id}`} key={order.id} className="block overflow-hidden rounded-2xl border border-(--container-background-sub)/70 bg-(--container-background) shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+            <div className="flex items-start justify-between gap-3 border-b border-(--container-background-sub)/60 px-4 py-4 sm:px-5">
+                <div>
+                    <p className="text-xs font-semibold tracking-wider text-(--text-color-sub)">ORDER</p>
+                    <h2 className="mt-0.5 text-xl font-bold text-(--text-color)">#{order.index}</h2>
+                </div>
+                <span className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold ${status.className}`}>
+                    {status.icon}
+                    {status.label}
+                </span>
+            </div>
+            <div className="grid grid-cols-2 gap-3 px-4 py-3 text-sm sm:px-5">
+                <div>
+                    <p className="text-xs text-(--text-color-sub)">注文日時</p>
+                    <time dateTime={new Date(order.requestedAt).toISOString()} className="mt-0.5 block font-medium text-(--text-color)">
+                        {new Date(order.requestedAt).toLocaleString()}
+                    </time>
+                </div>
+                <div className="text-right">
+                    <p className="text-xs text-(--text-color-sub)">合計金額</p>
+                    <p className="mt-0.5 text-lg font-bold text-(--app-theme)">¥{total.toLocaleString()}</p>
+                </div>
+            </div>
+            <div className="flex flex-col gap-2 bg-(--background) px-4 py-3 sm:px-5">
+                <Button
+                    className="w-full rounded-none rounded-b-xl bg-(--app-theme) text-(--app-theme-text)"
+                    onClick={() => cancel.request()}
+                >
+                    {
+                        cancel.waiting ? (
+                            <LoaderCircle size={15} strokeWidth={1.5} className="animate-spin text-(--app-theme-sub)/60" />
+                        ) : (
+                            "キャンセル"
+                        )
+                    }
+                </Button>
+            </div>
+            <div className="flex flex-col gap-2 bg-(--background) px-4 py-3 sm:px-5">
+                {
+                    order.cartItems.map((item) => (
+                        <div key={item.id} className="flex items-center gap-3 rounded-xl bg-(--container-background) p-2.5">
+                            <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-(--container-background-sub)">
+                                <Image src={item.product.img?.url ?? "/picture.png"} alt={item.product.name} fill sizes="56px" className="object-cover" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                                <p className="truncate font-bold text-(--text-color)">{item.product.name}</p>
+                                <p className="mt-1 text-sm text-(--text-color-sub)">数量 {item.count}</p>
+                            </div>
+                            <p className="text-sm font-semibold text-(--text-color)">¥{(item.product.price * item.count).toLocaleString()}</p>
+                        </div>
+                    ))
+                }
+            </div>
+        </Link>
     )
 }

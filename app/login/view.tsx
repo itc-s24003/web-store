@@ -25,12 +25,12 @@ export function PageView({ store, languages }: PageView_Props) {
                 <Content>
                     <div className="flex flex-col gap-2 max-w-lg mx-auto p-4">
                         <Image src={"/logo_512.png"} alt={""} width={512} height={512} className="aspect-sqare w-full rounded-xl" />
-                        <Button className="w-full p-4 bg-(--container-background) rounded-md" onClick={() => signIn("google", { callbackUrl: "/tutorial" })}>
+                        <Button className="w-full p-4 bg-(--container-background) rounded-md" onClick={() => signIn("google", { callbackUrl: "/" })}>
                             ログイン
                         </Button>
-                        <Link href={"/tutorial"} className="w-full p-4 bg-(--container-background) rounded-md text-center">
+                        {/* <Link href={"/tutorial"} className="w-full p-4 bg-(--container-background) rounded-md text-center">
                             使い方
-                        </Link>
+                        </Link> */}
                     </div>
                 </Content>
                 <Navigation />

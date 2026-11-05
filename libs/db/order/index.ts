@@ -112,9 +112,17 @@ export async function update(id: string, data: models["update"]) {
         },
         data,
         select: {
+            id: true,
             isCanceled: true,
             isReceived: true,
-            isReady: true
+            isReady: true,
+            user: {
+                select: {
+                    subscribe_endpoint: true,
+                    subscribe_authKey: true,
+                    subscribe_p256dh: true
+                }
+            }
         }
     })
 }
@@ -136,6 +144,27 @@ export async function cancel(id: string) {
         }
     })
 }
+
+
+
+export async function updates(targets: string[], data: models["update"]) {
+    db.$transaction(async tx => {
+        for (const id of targets) {
+            await tx.order.update({
+                where: {
+                    id
+                },
+                data,
+                select: {
+                    id: true
+                }
+            })
+        }
+    }, {
+        timeout: 1000 * 30
+    })
+}
+
 
 
 

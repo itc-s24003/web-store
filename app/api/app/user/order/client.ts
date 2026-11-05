@@ -18,3 +18,6 @@ export function add(cartItemIds: string[]) {
         { cartItemIds },
     );
 }
+
+
+export * from "./[id]/client"

@@ -15,9 +15,8 @@ export default async function Page() {
 
     const permission = await AppAPI.permission.get(email);
     if (!permission) unauthorized();
-    if (permission.isLock) forbidden();
 
-    const base = await AppDB._custom.base.get();
+    const base = await AppDB._custom.base.getCache();
 
-    return <PageView store={base.store} languages={base.languages} />;
+    return <PageView {...base} />;
 }

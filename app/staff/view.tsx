@@ -76,6 +76,17 @@ export function PageView({ store, languages }: PageViewProps) {
         const totalPrice = order.cartItems.reduce((acc, item) => acc + (item.product.price * item.count), 0);
         return acc + totalPrice;
     }, 0);
+
+
+    const received = useAPI(async () => {
+        const res = await API_Client.staff.order.updates(orders.map((order) => order.id), { isReceived: true });
+        if (res?.body.success) {
+            setOrders([]);
+        }
+    })
+    
+    
+    
     
     return (
         <AppView>
@@ -117,10 +128,7 @@ export function PageView({ store, languages }: PageViewProps) {
                                 hidden={orders.length === 0}
                                 className="flex min-h-14 flex-1 items-center justify-center gap-2 rounded-xl bg-(--container-background) px-4 py-3 text-base font-bold text-(--text-color) shadow-sm ring-1 ring-(--container-background-sub) transition-transform hover:scale-[1.01] active:scale-[0.99]"
                                 onClick={() => {
-                                    orders.forEach((order) => {
-                                        API_Client.staff.order.update(order.id, { isReceived: true });
-                                    });
-                                    setOrders([]);
+                                    received.request();
                                 }}
                             >
                                 <CheckCircle2 size={21} className="text-(--success)" aria-hidden="true" />すべて受け取り済みにする

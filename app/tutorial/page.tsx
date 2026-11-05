@@ -7,7 +7,7 @@ export const instant = false;
 
 export default async function Page() {
     await connection();
-    const base = await AppDB._custom.base.get();
+    const base = await AppDB._custom.base.getCache();
 
-    return <PageView store={base.store} languages={base.languages} />;
+    return <PageView {...base} />;
 }

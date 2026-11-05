@@ -3,6 +3,7 @@ import { app_api_map_gen, app_api_response } from "../../api";
 import z from "zod";
 import { AppAPI } from "@/libs/api";
 import { AppDB, AppDB_Types } from "@/libs/db";
+import { sendSocketData } from "@/libs/socket";
 
 export type AppAPI_user_Order_Map = app_api_map_gen<{
     GET: {
@@ -30,7 +31,7 @@ export async function GET() {
     const email = await AppAPI.session.getEmail();
     if (!email) return AppAPI.response.errorResponse.Unauthorized;
 
-    const permission = await AppAPI.permission.getDetail(email);
+    const permission = await AppAPI.permission.get(email);
     if (!permission) return AppAPI.response.errorResponse.Unauthorized;
 
     try {
@@ -80,6 +81,10 @@ export async function POST(req: NextRequest) {
 
     try {
         await AppDB.order.email.add(email, body.data.cartItemIds);
+        sendSocketData({
+            type: "add",
+            data: undefined
+        })
         return NextResponse.json<AppAPI_user_Order_Map["POST"]["res"]>({
             success: true,
             data: undefined

@@ -25,7 +25,7 @@ export function Header({ languages, userLanguageId, onLanguageChange, title, toa
                     {title}
                 </div>
             </div>
-            <select
+            {/* <select
                 value={userLanguageId ?? ""}
                 onChange={(e) => onLanguageChange && onLanguageChange(e.target.value)}
                 className="bg-transparent text-sm font-medium text-(--app-theme-text) focus:outline-none"
@@ -35,8 +35,11 @@ export function Header({ languages, userLanguageId, onLanguageChange, title, toa
                         {language.name}
                     </option>
                 ))}
-            </select>
-            <Link href={"/message"} className="relative flex h-9 w-9 items-center justify-center rounded-full bg-(--primary) px-1 text-xs font-medium text-(--background) shadow-sm">
+            </select> */}
+            <Link
+                hidden={toast === undefined}
+                href={"/message"} className="relative flex h-9 w-9 items-center justify-center rounded-full bg-(--primary) px-1 text-xs font-medium text-(--background) shadow-sm"
+            >
                 <Bell />
                 <span hidden={!toast || toast < 1} className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-(--secondary) text-[10px] font-bold text-(--background)">
                     {toast}

@@ -9,10 +9,13 @@ import { ContentWrapper } from "@/libs/element/layout/contentWrapper";
 import { Header } from "@/libs/element/layout/header";
 import { Navigation } from "@/libs/element/layout/navigation";
 import { useAPI } from "@/libs/element/state/useAPI";
-import { LoaderCircle, Minus, Plus, ReceiptText, ShoppingCart, Trash } from "lucide-react";
+import { ArrowBigDown, BellRing, LoaderCircle, Minus, Plus, ReceiptText, ShoppingCart, Trash, X } from "lucide-react";
 import { API_Client } from "../api/app/client";
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { useWebPush } from "@/libs/element/state/useWebPush";
+import { useAPI_UserDetailMin } from "@/libs/element/state/appAPI/userAPI_UserDetailMin";
+import { Popup } from "@/libs/element/popup";
 
 type PageView_Props = {
     store: AppDB_Types["store"]["model"],
@@ -40,12 +43,20 @@ export function PageView({ store, languages }: PageView_Props) {
     
     
     const order = useAPI(async () => {
-        const res = await API_Client.user.order.add(allCartItems.map((item) => item.id));
+        const res = await API_Client.user.order.add(allCartItems.filter(item => item.count <= item.product.stock).map((item) => item.id));
         if (res?.body.success) {
-            setAllCartItems([]);
+            get.request();
         }
     })
-    
+
+
+    const user = useAPI_UserDetailMin();
+    const webpush = useWebPush(() => {
+        window.location.reload();
+    })
+
+    const reqireRequestWebPush = !(user.user?.subscribe_hash && webpush.hash && webpush.hash === user.user.subscribe_hash) && !user.waiting && !webpush.waiting;
+    const [showWebPushPopup, setShowWebPushPopup] = useState(false);
     
     return (
         <AppView>
@@ -83,7 +94,19 @@ export function PageView({ store, languages }: PageView_Props) {
                                             <ShoppingCart size={19} className="text-(--app-theme)" />
                                             <h2 className="font-bold text-(--text-color)">注文内容</h2>
                                         </div>
-                                        <span className="text-sm text-(--text-color-sub)">小計</span>
+                                        <Button
+                                            className="flex items-center gap-1 rounded-full px-2 py-1 text-sm text-(--text-color-sub) hover:bg-(--app-theme)/10 hover:text-(--app-theme)"
+                                            onClick={() => get.request()}
+                                            disabled={get.waiting}
+                                        >
+                                            {
+                                                get.waiting ? (
+                                                    <LoaderCircle className="animate-spin"/>
+                                                ) : (
+                                                    "更新"
+                                                )
+                                            }
+                                        </Button>
                                     </div>
                                     <div className="flex items-center justify-between px-4 py-4 sm:px-5">
                                         <span className="text-sm text-(--text-color-sub)">合計金額</span>
@@ -92,7 +115,12 @@ export function PageView({ store, languages }: PageView_Props) {
                                     <div className="px-4 pb-4 sm:px-5">
                                         <Button
                                             className="flex w-full items-center justify-center gap-2 rounded-xl bg-(--app-theme) p-3 text-lg font-bold text-(--app-theme-text) transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
-                                            onClick={() => order.request()}
+                                            onClick={() => {
+                                                if (reqireRequestWebPush) {
+                                                    setShowWebPushPopup(true);
+                                                }
+                                                order.request()
+                                            }}
                                             disabled={order.waiting}
                                         >
                                             {order.waiting ? <LoaderCircle size={21} className="animate-spin" /> : "オーダーを確定"}
@@ -119,6 +147,46 @@ export function PageView({ store, languages }: PageView_Props) {
                 </Content>
                 <Navigation />
             </ContentWrapper>
+            <Popup hidden={!showWebPushPopup} className="z-50 bg-(--app-theme-sub)/70 px-5 backdrop-blur-sm">
+                <div
+                    className="relative w-full max-w-sm overflow-hidden rounded-3xl bg-(--container-background) shadow-2xl"
+                >
+                    <Button
+                        hidden={webpush.subscribe.waiting}
+                        className="absolute right-4 top-5 flex h-9 w-9 items-center justify-center rounded-full text-(--text-color-sub) transition-colors hover:bg-(--container-background-sub)/40"
+                        onClick={() => setShowWebPushPopup(false)}
+                    >
+                        <X size={19} aria-hidden="true" />
+                    </Button>
+                    <div className="px-6 pb-6 pt-7 text-center">
+                        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-(--app-theme)/10 text-(--app-theme)">
+                            <BellRing size={30} strokeWidth={1.8} aria-hidden="true" />
+                        </div>
+                        <h2 id="web-push-popup-title" className="mt-5 text-xl font-bold text-(--text-color)">通知を有効化</h2>
+                        <p className="mt-2 text-sm leading-6 text-(--text-color-sub)">
+                            注文の準備完了や受け取り可能になった際に、すぐにお知らせします。
+                        </p>
+                        <div className="mt-6 flex flex-col gap-2">
+                            <Button
+                                className="w-full rounded-xl bg-(--app-theme) px-4 py-3 text-base font-bold text-(--app-theme-text) transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+                                onClick={async () => {
+                                    await webpush.subscribe.request();
+                                    setShowWebPushPopup(false);
+                                }}
+                            >
+                                {webpush.subscribe.waiting ? "有効化中..." : "通知を有効化する"}
+                            </Button>
+                            <Button
+                                hidden={webpush.subscribe.waiting}
+                                className="w-full rounded-xl px-4 py-3 text-sm font-semibold text-(--text-color-sub) transition-colors hover:bg-(--container-background-sub)/30"
+                                onClick={() => setShowWebPushPopup(false)}
+                            >
+                                後で設定する
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            </Popup>
         </AppView>
     )
 }

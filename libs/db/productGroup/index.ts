@@ -183,4 +183,43 @@ export async function getEdit(): Promise<models["edit"][]> {
 
 
 
+export async function getDisplay(): Promise<models["deisplay"][]> {
+    return db.productGroup.findMany({
+        where: {
+            showTop: true
+        },
+        select: {
+            id: true,
+            name: true,
+            showTop: true,
+
+            img: {
+                select: {
+                    url: true
+                }
+            },
+            
+            products: {
+                select: {
+                    name: true,
+
+                    img: {
+                        select: {
+                            url: true
+                        }
+                    }
+                }
+            },
+
+            _count: {
+                select: {
+                    products: true
+                }
+            }
+        }
+    })
+}
+
+
+
 export type { models } from "./type"

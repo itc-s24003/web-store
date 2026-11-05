@@ -12,6 +12,18 @@ export function getAll() {
 }
 
 
+export function updates(targets: string[], data: AppAPI_staff_Order_Map["PATCH"]["req"]["body"]["data"]) {
+    return api_client_req<AppAPI_staff_Order_Map, "PATCH">(
+        "/api/app/staff/order", "PATCH",
+        undefined,
+        {
+            targets,
+            data
+        }
+    );
+}
+
+
 
 
 export * from "./[id]/client"
