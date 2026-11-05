@@ -8,15 +8,15 @@ import { APP_ENV } from "./env";
 
 export default async function Page() {
     cacheLife({
-      stale: 1000 * APP_ENV.CLIENT_CACHE,
-      revalidate: 1000 * APP_ENV.SERVER_CACHE
+        stale: 1000 * APP_ENV.CLIENT_CACHE,
+        revalidate: 1000 * APP_ENV.SERVER_CACHE
     })
   
   
-    const languages = await AppDB.language.getAll();
-    const productGroups = await AppDB.productGroup.getAll();
+    const base = await AppDB._custom.base.getCache();
+    const productGroups = await AppDB.productGroup.getDisplay();
     
     return (
-      <PageView languages={languages} productGroups={productGroups}/>
+        <PageView {...base} productGroups={productGroups}/>
     );
 }

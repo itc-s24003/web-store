@@ -94,6 +94,38 @@ type Model_ProductGroupDetail = Prisma.ProductGroupGetPayload<{
     }
 }>
 
+type Model_ProductDisplay = Prisma.ProductGroupGetPayload<{
+    select: {
+        id: true,
+        name: true,
+        showTop: true,
+
+        img: {
+            select: {
+                url: true
+            }
+        },
+        
+        products: {
+            select: {
+                name: true,
+
+                img: {
+                    select: {
+                        url: true
+                    }
+                }
+            }
+        },
+
+        _count: {
+            select: {
+                products: true
+            }
+        }
+    }
+}>
+
 
 
 type Model_ProductGroup_Edit = Prisma.ProductGroupGetPayload<{
@@ -126,6 +158,7 @@ export type models = {
     update: Model_ProductUpdate,
     model: Model_ProductGroup,
     detail: Model_ProductGroupDetail,
+    deisplay: Model_ProductDisplay,
 
     edit: Model_ProductGroup_Edit
 }

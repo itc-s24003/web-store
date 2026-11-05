@@ -1,3 +1,6 @@
+"use client";
+
+
 import { AppView } from "@/libs/element/layout";
 
 export function PageView() {

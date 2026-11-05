@@ -1,14 +1,16 @@
-import { useState } from "react";
+"use client";
+
+
+import { useEffect, useState } from "react";
 import { useAPI } from "../useAPI";
 import { API_Client } from "@/app/api/app/client";
 
 export function useLanguage() {
     const [langId, setLangId] = useState<string | null>(() => {
-        return window.localStorage.getItem("langId");
+        return typeof window !== "undefined" ? window.localStorage.getItem("langId") : null;
     });
 
     useAPI(async () => {
-        API_Client.user.user.update
     })
 
 

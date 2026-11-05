@@ -1,3 +1,6 @@
+"use client";
+
+
 import { AppDB_Types } from "@/libs/db";
 import { AppView } from "@/libs/element/layout";
 import { Content } from "@/libs/element/layout/content";

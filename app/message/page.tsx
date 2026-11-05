@@ -1,6 +1,8 @@
 import { AppAPI } from "@/libs/api";
 import { PageView } from "./view";
-import { forbidden, unauthorized } from "next/navigation";
+import { unauthorized } from "next/navigation";
+
+export const instant = false;
 
 export default async function Page() {
     const email = await AppAPI.session.getEmail();
@@ -8,7 +10,6 @@ export default async function Page() {
 
     const permission = await AppAPI.permission.get(email);
     if (!permission) unauthorized();
-    if (permission.isLock) forbidden();
 
 
     return <PageView />;

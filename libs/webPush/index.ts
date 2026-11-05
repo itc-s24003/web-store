@@ -43,3 +43,20 @@ export type ServiceWorkerData = {
 }
 
 
+
+type genServiceData<type extends string, data> = {
+    type: type,
+    data: data
+}
+
+export type ServiceData =
+    genServiceData<"add", undefined> |
+    genServiceData<"update", {
+        targetId: string
+    }>
+
+
+export type SocketEventMap = {
+    "data": (data: ServiceData) => void,
+    "verified": () => void
+}

@@ -18,8 +18,9 @@ export default async function Page() {
     if (!permission) redirect("/login");
     if (permission.isLock) forbidden();
 
-    const base = await AppDB._custom.base.get();
-    const orders = await AppDB.order.email.getAll(email);
 
-    return <PageView store={base.store} languages={base.languages} orders={orders} />;
+    
+    const base = await AppDB._custom.base.getCache();
+
+    return <PageView {...base} />;
 }

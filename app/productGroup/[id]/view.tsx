@@ -12,22 +12,29 @@ import { Content } from "@/libs/element/layout/content";
 import { ContentWrapper } from "@/libs/element/layout/contentWrapper";
 import { Header } from "@/libs/element/layout/header";
 import { Navigation } from "@/libs/element/layout/navigation";
+import { useAPI_UserDetailMin } from "@/libs/element/state/appAPI/userAPI_UserDetailMin";
 import { useAPI } from "@/libs/element/state/useAPI";
 import Link from "next/link";
 import { useState } from "react";
 
 type PageView_Props = {
+    store: AppDB_Types["store"]["model"],
     languages: AppDB_Types["language"]["model"][],
     productGroup: AppDB_Types["productGroup"]["detail"]
 }
 
-export function PageView({ languages, productGroup }: PageView_Props) {
+export function PageView({ store, languages, productGroup }: PageView_Props) {
+    const user = useAPI_UserDetailMin();
+    
+    
+    
     return (
         <AppView>
             <Header
                 languages={languages}
-                userLanguageId=""
-                title={"オンラインストア"} toast={3}
+                userLanguageId={null}
+                title={store.name}
+                toast={user.user?._count.messages}
             />
             <ContentWrapper>
                 <Content>
@@ -35,7 +42,7 @@ export function PageView({ languages, productGroup }: PageView_Props) {
                         {
                             productGroup.products.map((p) => (
                                 <span key={p.id} className="w-full sm:size-fit flex justify-center">
-                                    <ProductView key={p.id} product={p} className="flex-1"/>
+                                    <ProductView key={p.id} product={p} className="flex-1" canAddCart={!user.waiting && user.user !== undefined}/>
                                 </span>
                             ))
                         }
@@ -50,33 +57,49 @@ export function PageView({ languages, productGroup }: PageView_Props) {
 
 
 type ProductView_Props = {
-    product: AppDB_Types["product"]["model"]
+    product: AppDB_Types["product"]["model"],
+    canAddCart: boolean
 } & React.JSX.IntrinsicElements["div"]
 
-function ProductView({ product, ...props }: ProductView_Props) {
+function ProductView({ product, canAddCart, ...props }: ProductView_Props) {
     const [count, setCount] = useState<number>(1);
+    const [success, setSuccess] = useState<boolean>(true);
     const addCart = useAPI(async () => {
         const res = await API_Client.user.cartItem.add({
             productId: product.id,
             count
         })
+        setSuccess(res?.body.success ?? false);
     })
     
     
     return (
         <Display_Product key={product.id} name={product.name} imgSrc={product.img?.url} price={product.price} {...props}>
-            <div className="flex-1 flex flex-col gap-2 justify-end">
-                <Select value={count} onChange={(e) => setCount(Number(e.target.value))} className="text-lg">
+            <div className="flex-1 flex flex-col gap-2">
+                <p>
+                    {
+                        product.showStockDetail ? "在庫: " : "予定在庫: "
+                    }
+                    {product.stock}個
+                </p>
+                <Select
+                    hidden={!canAddCart}
+                    value={count} onChange={(e) => setCount(Number(e.target.value))} className="text-lg"
+                >
                     {
                         Array.from({ length: 5 }, (_, i) => i + 1).map((n) => (
                             <Option key={n} value={n}>x{n}</Option>
                         ))
                     }
                 </Select>
-                <Button onClick={() => addCart.request()} className="rounded-full w-full bg-(--app-theme) text-(--app-theme-text)">
+                <label hidden={success} className="text-sm text-red-500">※追加に失敗しました</label>
+                <Button
+                    hidden={!canAddCart}
+                    onClick={() => {addCart.request()}} className="rounded-full w-full bg-(--app-theme) text-(--app-theme-text)"
+                >
                     <div className="bg-white/5 p-2 rounded-full">
                         {
-                            addCart.waiting ? "追加中..." : "カートに追加"
+                            addCart.waiting ? "追加中...": "カートに追加"
                         }
                     </div>
                 </Button>

@@ -7,6 +7,7 @@ import {
     app_api_response
 } from "../../../api";
 import { AppDB, AppDB_Types } from "@/libs/db";
+import { sendServiceWorkerData } from "@/libs/webPush";
 
 export type AppAPI_staff_order__id__Map = app_api_map_gen<{
     PATCH: {
@@ -52,8 +53,24 @@ export async function PATCH(_req: NextRequest, p: api_url_param_id) {
     if (!parsedBody.success) return AppAPI.response.errorResponse.BadRequest;
 
     try {
-        await AppDB.order.update(parsed.data, parsedBody.data);
-    } catch {
+        const res = await AppDB.order.update(parsed.data, parsedBody.data);
+        if (parsedBody.data.isReady) {
+            const { subscribe_authKey, subscribe_endpoint, subscribe_p256dh } = res.user;
+            if (subscribe_authKey && subscribe_endpoint && subscribe_p256dh) {
+                sendServiceWorkerData(subscribe_endpoint, subscribe_authKey, subscribe_p256dh, [
+                    {
+                        type: "notification",
+                        data: {
+                            title: "注文の準備ができました",
+                            body: "注文の準備ができました。受け取りに行きましょう。",
+                            url: `/order/${res.id}`,
+                        }
+                    }
+                ])
+            }
+        }
+    } catch (e) {
+        console.error(e);
         return AppAPI.response.errorResponse.ServerError;
     }
 

@@ -2,9 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { app_api_map_gen, app_api_response } from "../../api";
 import z from "zod";
 import { AppAPI } from "@/libs/api";
-import { AppDB } from "@/libs/db";
+import { AppDB, AppDB_Types } from "@/libs/db";
+import { sendSocketData } from "@/libs/socket";
 
 export type AppAPI_user_Order_Map = app_api_map_gen<{
+    GET: {
+        req: {
+            params: undefined,
+            body: undefined
+        },
+        res: app_api_response<AppDB_Types["order"]["model"][]>
+    }
     POST: {
         req: {
             params: undefined,
@@ -15,6 +23,34 @@ export type AppAPI_user_Order_Map = app_api_map_gen<{
         res: app_api_response<undefined>
     }
 }>
+
+
+
+
+export async function GET() {
+    const email = await AppAPI.session.getEmail();
+    if (!email) return AppAPI.response.errorResponse.Unauthorized;
+
+    const permission = await AppAPI.permission.get(email);
+    if (!permission) return AppAPI.response.errorResponse.Unauthorized;
+
+    try {
+        const orders = await AppDB.order.email.getAll(email, {
+            isCanceled: false,
+            isReceived: false
+        })
+        return NextResponse.json<AppAPI_user_Order_Map["GET"]["res"]>({
+            success: true,
+            data: orders
+        })
+
+    } catch {
+        return AppAPI.response.errorResponse.ServerError;
+
+    }
+}
+
+
 
 
 
@@ -45,6 +81,10 @@ export async function POST(req: NextRequest) {
 
     try {
         await AppDB.order.email.add(email, body.data.cartItemIds);
+        sendSocketData({
+            type: "add",
+            data: undefined
+        })
         return NextResponse.json<AppAPI_user_Order_Map["POST"]["res"]>({
             success: true,
             data: undefined

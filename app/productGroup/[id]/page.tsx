@@ -7,6 +7,7 @@ import { APP_ENV } from "@/app/env";
 import { AppDB } from "@/libs/db";
 import { NextRequest } from "next/server";
 import { api_url_param_id } from "@/app/api/app/api";
+import { notFound } from "next/navigation";
 
 export const instant = false
 
@@ -25,9 +26,9 @@ async function View(id: string) {
     })
 
 
-    const languages = await AppDB.language.getAll();
+    const base = await AppDB._custom.base.getCache();
     const detail = await AppDB.productGroup.getDetail(id);
-    if (!detail) throw new Error("Product group not found");
+    if (!detail) notFound();
 
-    return <PageView languages={languages} productGroup={detail} />;
+    return <PageView {...base} productGroup={detail} />;
 }

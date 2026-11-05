@@ -30,6 +30,7 @@ type Model_Order = Prisma.OrderGetPayload<{
                         id: true,
                         name: true,
                         price: true,
+                        stock: true,
                         img: {
                             select: {
                                 url: true

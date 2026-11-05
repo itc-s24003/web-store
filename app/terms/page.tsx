@@ -1,14 +1,13 @@
-import { AppAPI } from "@/libs/api";
+"use cache";
+
+
 import { PageView } from "./view";
-import { forbidden, unauthorized } from "next/navigation";
+import { cacheLife } from "next/cache";
 
 export default async function Page() {
-    const email = await AppAPI.session.getEmail();
-    if (!email) unauthorized();
-
-    const permission = await AppAPI.permission.get(email);
-    if (!permission) unauthorized();
-    if (permission.isLock) forbidden();
+    cacheLife({
+        stale: 1000 * 60 * 60 * 24,
+    })
 
 
     return <PageView />;
